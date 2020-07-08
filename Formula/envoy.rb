@@ -18,7 +18,7 @@ class Envoy < Formula
     system "bazelisk", "--bazelrc=/dev/null",
                        "build",
                        "-s",
-                       "--action_env=PATH=/usr/local/bin:/opt/local/bin:/usr/bin:/bin",
+                       "--action_env=PATH=/usr/local/bin:/usr/local/opt/coreutils/libexec/gnubin:/opt/local/bin:/usr/bin:/bin",
                        "-c",
                        "opt",
                        "//source/exe:envoy-static.stripped"
