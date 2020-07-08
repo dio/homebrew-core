@@ -1,0 +1,17 @@
+name: Single test
+on:
+  push:
+    branches: envoy
+  pull_request: []
+jobs:
+  build:
+    name: Test Envoy
+    runs-on: macos-latest
+    steps:
+      - run: brew update-reset "$(brew --repository)"
+      - run: brew tap "$GITHUB_REPOSITORY"
+      - run: brew update-reset "$(brew --repository "$GITHUB_REPOSITORY")"
+      - run: brew install dio/core/envoy -s --verbose || true
+      - run: brew test dio/core/envoy --verbose
+      - run: brew audit --new-formula dio/core/envoy
+      - run: brew audit --strict dio/core/envoy
