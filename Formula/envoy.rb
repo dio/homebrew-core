@@ -15,15 +15,10 @@ class Envoy < Formula
   depends_on "llvm@10" => :build
 
   def install
-    system "bazelisk", "--bazelrc=/dev/null",
-                       "build",
-                       "-s",
-                       "--action_env=PATH=/usr/local/bin:/usr/local/opt/coreutils/libexec/gnubin:/opt/local/bin:/usr/bin:/bin",
-                       "-c",
-                       "opt",
-                       "//source/exe:envoy-static.stripped"
-
-    bin.install "bazel-bin/source/exe/envoy-static.stripped" => "envoy"
+    ENV["PATH"] = "/usr/local/bin:/opt/local/bin:/usr/bin:/bin:#{ENV["PATH"]}"
+    system "clang", "--version"
+    system "c++", "--version"
+    system "clang++", "--version"
   end
 
   test do
