@@ -23,7 +23,9 @@ class Envoy < Formula
   # end
 
   def install
-    ENV["PATH"] = "/usr/local/bin:/opt/local/bin:/usr/bin:/bin:#{ENV["PATH"]}"
+    ENV["PATH"] = "/usr/local/opt/llvm/bin:/usr/local/bin:/opt/local/bin:/usr/bin:/bin:#{ENV["PATH"]}"
+    ENV["LDFLAGS"] = "-L/usr/local/opt/llvm/lib -Wl,-rpath,/usr/local/opt/llvm/lib"
+    ENV["CPPFLAGS"] = "-I/usr/local/opt/llvm/include"
     system "bazelisk", "--bazelrc=/dev/null",
                        "build",
                        "-c",
