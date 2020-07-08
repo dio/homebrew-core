@@ -12,6 +12,7 @@ class Envoy < Formula
   depends_on "libtool" => :build
   depends_on "ninja" => :build
   depends_on "wget" => :build
+  depends_on "llvm@10" => :build
 
   def install
     system "bazelisk", "--bazelrc=/dev/null",
