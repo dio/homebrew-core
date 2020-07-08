@@ -16,6 +16,7 @@ class Envoy < Formula
   def install
     system "bazelisk", "--bazelrc=/dev/null",
                        "build",
+                       "-s",
                        "--action_env=PATH=/usr/local/bin:/opt/local/bin:/usr/bin:/bin",
                        "-c",
                        "opt",
