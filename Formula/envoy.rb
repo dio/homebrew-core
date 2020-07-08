@@ -13,6 +13,14 @@ class Envoy < Formula
   depends_on "ninja" => :build
   depends_on "wget" => :build
 
+  # Fix source/common/common/utility.cc:309:21: error: loop variable 'token' of type
+  # 'const absl::string_view' creates a copy from type 'const absl::string_view'
+  # [-Werror,-Wrange-loop-analysis]
+  patch do
+    url "https://gist.githubusercontent.com/dio/c2bc5b654accd3f700a6deffd8927cff/raw/aaf8d4512dea868d20e7aadf1e7bca32430635b1/common_common_utility.patch"
+    sha256 "3c42a1b5dcc4bbb509386c67b10a86cc9e8e0425e41290d61837a306c5687e26"
+  end
+
   def install
     system "bazelisk", "--bazelrc=/dev/null",
                        "build",
