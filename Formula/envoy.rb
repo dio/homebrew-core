@@ -16,9 +16,13 @@ class Envoy < Formula
 
   def install
     ENV["PATH"] = "/usr/local/bin:/opt/local/bin:/usr/bin:/bin:#{ENV["PATH"]}"
-    system "clang", "--version"
-    system "c++", "--version"
-    system "clang++", "--version"
+    system "clang", "--bazelrc=/dev/null",
+                       "build",
+                       "-c",
+                       "opt",
+                       "//source/exe:envoy-static.stripped"
+
+    bin.install "bazel-bin/source/exe/envoy-static.stripped" => "envoy"
   end
 
   test do
