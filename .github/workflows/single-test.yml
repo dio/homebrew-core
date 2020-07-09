@@ -11,4 +11,4 @@ jobs:
       - uses: actions/checkout@v2
         with:
           ref: envoy
-      - run: brew install --debug ./Formula/envoy.rb
+      - run: brew install --env=std --verbose ./Formula/envoy.rb
