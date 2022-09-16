@@ -8,22 +8,8 @@ class Envoy < Formula
 
   stable do
     url "https://github.com/envoyproxy/envoy.git",
-        tag:      "v1.22.2",
-        revision: "c919bdec19d79e97f4f56e4095706f8e6a383f1c"
-
-    # Fix build on Apple Silicon which fails on undefined symbol:
-    # v8::internal::trap_handler::TryHandleSignal(int, __siginfo*, void*)
-    patch do
-      url "https://github.com/envoyproxy/envoy/commit/823f81ea8a3c0f792a7dbb0d08422c6a3d251152.patch?full_index=1"
-      sha256 "c48ecebc8a63f41f8bf8c4598a6442402470f2f04d20511e1aa3a1f322beccc7"
-    end
-
-    # Fix build with GCC in "opt" mode which fails on strict-aliasing rules:
-    # type_url_, reinterpret_cast<std::vector<DecodedResourcePtr>&>(decoded_resources),
-    patch do
-      url "https://github.com/envoyproxy/envoy/commit/aa06f653ed736b428f3ea69900aa864ce4187305.patch?full_index=1"
-      sha256 "d05b1519e6d0d78619457deb3d0bed6bb69ee2f095d31b9913cc70c9ee851e80"
-    end
+        tag:      "v1.23.1",
+        revision: "edd69583372955fdfa0b8ca3820dd7312c094e46"
   end
 
   livecheck do
