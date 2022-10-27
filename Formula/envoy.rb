@@ -1,24 +1,18 @@
 class Envoy < Formula
   desc "Cloud-native high-performance edge/middle/service proxy"
   homepage "https://www.envoyproxy.io/index.html"
-  # Switch to a tarball when the following issue is resolved:
-  # https://github.com/envoyproxy/envoy/issues/2181
+  url "https://github.com/envoyproxy/envoy/archive/refs/tags/v1.24.0.tar.gz"
+  sha256 "31a81841447fbb51589a198d8e8998f2b8ad1fff4921e017fa37691015b3a9f9"
   license "Apache-2.0"
   head "https://github.com/envoyproxy/envoy.git", branch: "main"
 
   stable do
-    url "https://github.com/envoyproxy/envoy.git",
-        tag:      "v1.23.1",
-        revision: "edd69583372955fdfa0b8ca3820dd7312c094e46"
-
-    # Fix build failure on macOS 10.15 due to error at
-    # source/extensions/filters/http/file_system_buffer/filter.cc:402:53:
-    # error: no viable constructor or deduction guide for deduction of template arguments of 'weak_ptr'.
-    # For the next v1.23.x release, this can be removed after https://github.com/envoyproxy/envoy/pull/23177
-    # is merged.
     patch do
-      url "https://github.com/envoyproxy/envoy/commit/68aa00067bbeb7aaf13599f75e54e8837cfb13ef.patch?full_index=1"
-      sha256 "0efbefd5cab5ada6c46845535644339733c4198ac21582401ba038605bc4ed5b"
+      # Pull the "tools/github/write_current_source_version.py": a tool to write SOURCE_VERSION file,
+      # hence we can build for an extracted release tarball. This tool will be included in the next
+      # tagged release.
+      url "https://github.com/envoyproxy/envoy/commit/d9707e2eba1104823f5fde7d6f739112edc3e60f.patch?full_index=1"
+      sha256 "1ed80177f97eb542b7a862bfbd13fe34275ea2ae041733c5935c96b286bbdbcc"
     end
   end
 
@@ -28,7 +22,6 @@ class Envoy < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "8a6670aa7eaf0fb59ae07319e0ecc4ba0f5e7707b1f2ac494ee4756635d21311"
     sha256 cellar: :any_skip_relocation, arm64_monterey: "e7bf1c8a8edd41908a662bcf5f4d12fe097635c16a5274de321e5e632a72ec4f"
     sha256 cellar: :any_skip_relocation, arm64_big_sur:  "f63c8c45373a38df81fe854f6064c0c4bcecd0c8b5cadf0bf5408999b29e6aac"
     sha256 cellar: :any_skip_relocation, monterey:       "3aaa744a59e5ed4dd1b316ec020fdaaa03ea267b7aa33d3a7ce25b0031d1c6a5"
@@ -85,10 +78,26 @@ class Envoy < Formula
       # Disable extension `tcp_stats` which requires Linux headers >= 4.6
       # It's a directive with absolute path `#include </usr/include/linux/tcp.h>`
       args << "--//source/extensions/transport_sockets/tcp_stats:enabled=false"
+    else
+      # The clang available on macOS catalina has a warning that isn't clean on v8 code.
+      # The warning doesn't show up with more recent clangs, so disable it for now.
+      args << "--cxxopt=-Wno-range-loop-analysis"
+      args << "--host_cxxopt=-Wno-range-loop-analysis"
+
+      # To supress warning on deprecated declaration on v8 code. For example:
+      # external/v8/src/base/platform/platform-darwin.cc:56:22: 'getsectdatafromheader_64'
+      # is deprecated: first deprecated in macOS 13.0.
+      # https://bugs.chromium.org/p/v8/issues/detail?id=13428.
+      # Reference: https://github.com/envoyproxy/envoy/pull/23707.
+      args << "--cxxopt=-Wno-deprecated-declarations"
+      args << "--host_cxxopt=-Wno-deprecated-declarations"
     end
 
-    system Formula["bazelisk"].opt_bin/"bazelisk", "build", *args, "//source/exe:envoy-static"
-    bin.install "bazel-bin/source/exe/envoy-static" => "envoy"
+    # Write the current version SOURCE_VERSION.
+    system "python3", "tools/github/write_current_source_version.py"
+
+    system Formula["bazelisk"].opt_bin/"bazelisk", "build", *args, "//source/exe:envoy-static.stripped"
+    bin.install "bazel-bin/source/exe/envoy-static.stripped" => "envoy"
     pkgshare.install "configs", "examples"
   end
 
